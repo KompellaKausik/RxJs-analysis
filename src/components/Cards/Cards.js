@@ -24,7 +24,7 @@ const useStyles = makeStyles({
    
   });
 
-const Cards = ({ data }) => {
+const Cards = ({data}) => {
     const classes = useStyles();
   console.log(data);
   if(!data.confirmed){

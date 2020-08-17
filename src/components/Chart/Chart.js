@@ -2,20 +2,21 @@ import React,{useState,useEffect} from 'react';
 import { fetchDailyData } from '../../api/apiCalls';
 import {Line,Bar} from 'react-chartjs-2';
 import { Grid } from '@material-ui/core';
+import { from } from 'rxjs';
 
 const Chart = ({data:{confirmed,recovered,deaths},country}) =>{
     const [dailyData, setDailyData] = useState([])
 
     useEffect(() =>{
-        const fetchApi = async () => {
-        setDailyData(await fetchDailyData())
-        }
-        fetchApi()
-        console.log(dailyData)
+
+        const ModifiedData$ = from(fetchDailyData())
+        ModifiedData$.subscribe({
+            next: (result) => setDailyData(result),
+            complete: console.log("modified data")
+        })
 
     },[])
-
-    console.log({confirmed,recovered,deaths});
+    console.log(dailyData)
     const lineChart = (
         dailyData.length
         ?(
@@ -23,13 +24,13 @@ const Chart = ({data:{confirmed,recovered,deaths},country}) =>{
             data={{
                 labels:dailyData.map(({date}) => date),
                 datasets:[{
-                    data:dailyData.map(({confirmed}) => confirmed),
+                    data:dailyData.map(({confirmed}) => confirmed.total),
                     label:'Infected',
                     borderColor:'blue',
                     fill:true
                 },
                 {
-                    data:dailyData.map(({deaths}) => deaths),
+                    data:dailyData.map(({deaths}) => deaths.total),
                     label:'Deaths',
                     borderColor:'red',                    
                     fill:true
